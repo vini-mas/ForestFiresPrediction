@@ -89,7 +89,7 @@ def read_inmet_files():
         except:
             pass
 
-        if file_index > LIMIT_INMET:
+        if LIMIT_INMET and file_index > LIMIT_INMET:
             print("BREAK")
             break
 

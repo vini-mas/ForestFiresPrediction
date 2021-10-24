@@ -52,10 +52,17 @@ def open_file_fires():
     file.close()
 
 
+#filename --> INMET_S_RS_A810_SANTA ROSA_01-01-2020_A_31-12-2020.CSV
+#filename_list --> ['INMET', 'S', 'RS', 'A810', 'SANTA ROSA', '01-01-2020', 'A', '31-12-2020.CSV']
+#file_city --> SANTA ROSA
 def assign_inmet_to_fire():
-    for filaname in os.listdir(directory_inmet):
-        print(filaname)
-
+    for filename in os.listdir(directory_inmet):
+        try:
+            filename_list = filename.split("_")
+            file_city = filename_list[4]
+            print(file_city)
+        except:
+            pass
 
 def save_fire_in_fires_list(row):
     list_day_hour = row[0].split(" ")
@@ -64,9 +71,6 @@ def save_fire_in_fires_list(row):
     city = row[4]
     fire = Fire(day, hour, city, None)
     fires.append(fire)
-
-
-#pegar os dados e colocar na tabela do FiresOutbreaks
 
 if "__main__":
     open_file_fires()

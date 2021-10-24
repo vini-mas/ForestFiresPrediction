@@ -7,23 +7,19 @@ directory_inmet = "Data/Climate-INPE/2020"
 #global fires
 fires = []
 
-def open_file_inmet():
-    file = open("Data/Climate-INPE/2020/INMET_CO_DF_A042_BRAZLANDIA_01-01-2020_A_31-12-2020.CSV")
+inmet = []
+
+def open_and_save_inmet_file(file_inmet):
+    file = open(file_inmet)
 
     type(file)
 
     csv_reader = csv.reader(file)
 
-    header = []
-    for header in csv_reader:
-        header = next(csv_reader)
-        print(header)
-
-
     rows = []
     for row in csv_reader:
         rows.append(row)
-    print(rows[0])
+        print(row)
 
     file.close()
 
@@ -41,13 +37,8 @@ def open_file_fires():
 
     rows = []
     for row in csv_reader:
-        rows.append(row)
         if not is_fire_csv_header(row[0]): 
             save_fire_in_fires_list(row)
-        
-
-    print(rows[0])
-    print(rows[1])
 
     file.close()
 
@@ -55,24 +46,34 @@ def open_file_fires():
 #filename --> INMET_S_RS_A810_SANTA ROSA_01-01-2020_A_31-12-2020.CSV
 #filename_list --> ['INMET', 'S', 'RS', 'A810', 'SANTA ROSA', '01-01-2020', 'A', '31-12-2020.CSV']
 #file_city --> SANTA ROSA
-def assign_inmet_to_fire():
+#file_inmet --> Data/Climate-INPE/2020/INMET_S_RS_A810_SANTA ROSA_01-01-2020_A_31-12-2020.CSV
+def save_inmet_file_related_to(fire):
     for filename in os.listdir(directory_inmet):
         try:
             filename_list = filename.split("_")
             file_city = filename_list[4]
-            print(file_city)
         except:
             pass
+
+        if(fire.city == file_city):
+            file_inmet = os.path.join(directory_inmet, filename)
+            if os.path.isfile(file_inmet):
+                open_and_save_inmet_file(file_inmet)
+
+def assign_inmet_to(fire):
+    return
 
 def save_fire_in_fires_list(row):
     list_day_hour = row[0].split(" ")
     day = list_day_hour[0]
     hour = list_day_hour[1]
-    city = row[4]
+    city = row[4].upper()
     fire = Fire(day, hour, city, None)
     fires.append(fire)
 
 if "__main__":
     open_file_fires()
-    print(fires[0].city)
-    assign_inmet_to_fire()
+    #print(fires[0].city)
+    fires[0].city = "RIO PARDO"
+    save_inmet_file_related_to(fires[0])
+    assign_inmet_to(fires[0])

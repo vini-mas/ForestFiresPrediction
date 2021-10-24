@@ -9,7 +9,8 @@ from datetime import datetime
 
 # DEBUG
 PRINT_HEADER=False
-LIMIT = None # the 100 first dont hit
+LIMIT = 5000 #None # the 100 first dont hit
+LIMIT_INMET = 200
 
 # CONSTANTS
 directory_inmet = "Data/Climate-INPE/2020"
@@ -61,7 +62,7 @@ def read_file_fires():
 
 
 def read_inmet_files():
-    for filename in os.listdir(directory_inmet):
+    for file_index, filename in enumerate(os.listdir(directory_inmet)):
         try:
             filename_list = filename.split("_")
             city = filename_list[4]
@@ -87,6 +88,10 @@ def read_inmet_files():
                     cities_inmet[city] = map(lambda x: Inmet.init(x, city), lista)
         except:
             pass
+
+        if file_index > LIMIT_INMET:
+            print("BREAK")
+            break
 
 
 #filename --> INMET_S_RS_A810_SANTA ROSA_01-01-2020_A_31-12-2020.CSV
@@ -155,7 +160,6 @@ def main():
 
     print('{} - Assigning inmet to FIRES'.format(datetime.now()))
     total = len(fires)
-    print(total)
     for index, fire in enumerate(fires):
         if fire.city in cities_inmet:
             assign_inmet_to(fire)
@@ -169,12 +173,19 @@ def main():
             
 
     print('{} - Showing one result'.format(datetime.now()))
-    for fire in fires:
+    hits = 0
+    valid = None
+    for index, fire in enumerate(fires):
         if fire.inmet:
-            print('here')
-            print(fire)
-            print(fire.inmet)
-            break
+            hits += 1
+            valid = index
+    
+    print('hits: {}/{} total'.format(hits, len(fires)))
+    print(fires[valid])
+    print(fires[valid].inmet)
+    
+    
+
 
 
 if "__main__":

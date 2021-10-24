@@ -1,3 +1,5 @@
+import json
+
 def format_hour(hour):
     return hour[0] + hour[1] + "00"
 
@@ -22,5 +24,5 @@ class Inmet():
         return inmet
 
     def __str__(self):
-        return self.__dict__
+        return json.dumps(self.__dict__, indent=True)
         # return ("Day: "+ self.day + " \nHour: " + self.hour + " \nCity: " + self.city)

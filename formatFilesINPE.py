@@ -1,5 +1,6 @@
 import csv
 from fire import *
+from inmet import *
 import os
 
 directory_inmet = "Data/Climate-INPE/2020"
@@ -7,7 +8,9 @@ directory_inmet = "Data/Climate-INPE/2020"
 #global fires
 fires = []
 
-one_city_inmet = []
+one_city_inmet_list = []
+
+city_inmet = ""
 
 def open_and_save_inmet_file(file_inmet):
     file = open(file_inmet)
@@ -18,11 +21,20 @@ def open_and_save_inmet_file(file_inmet):
 
     rows = []
     for row in csv_reader:
-        rows.append(row)
-        print(row)
+        if not is_inmet_csv_header(row[0]):
+            save_inmet_in_one_city_inmet_list(row)
 
     file.close()
 
+def save_inmet_in_one_city_inmet_list(row):
+    day = row[0]
+    hour = row[1]
+    city = city_inmet
+    inmet = Inmet(day, hour, city)
+    one_city_inmet_list.append(inmet)
+
+def is_inmet_csv_header(name):
+    return name in ["REGIAO:", "UF:", "ESTACAO:", "CODIGO (WMO):", "LATITUDE:", "LONGITUDE:", "ALTITUDE:", "DATA DE FUNDACAO:", "Data"]
 
 def is_fire_csv_header(name):
     return name == "datahora"
@@ -76,4 +88,6 @@ if "__main__":
     #print(fires[0].city)
     fires[0].city = "RIO PARDO"
     save_inmet_file_related_to(fires[0])
+    print(one_city_inmet_list[0].day)
+    print(one_city_inmet_list[0].city)
     assign_inmet_to(fires[0])

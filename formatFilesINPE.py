@@ -9,7 +9,7 @@ from datetime import datetime
 
 # DEBUG
 PRINT_HEADER=False
-LIMIT = 100 # None
+LIMIT = None # the 100 first dont hit
 
 # CONSTANTS
 directory_inmet = "Data/Climate-INPE/2020"
@@ -56,7 +56,6 @@ def read_file_fires():
     for row in csv_reader:
         if not is_fire_csv_header(row[0]): 
             save_fire_in_fires_list(row)
-            break
 
     file.close()
 
@@ -156,11 +155,13 @@ def main():
 
     print('{} - Assigning inmet to FIRES'.format(datetime.now()))
     total = len(fires)
+    print(total)
     for index, fire in enumerate(fires):
         if fire.city in cities_inmet:
             assign_inmet_to(fire)
 
         if LIMIT and index > LIMIT:
+            print('ABORT')
             break
 
         if index % 100 == 0:

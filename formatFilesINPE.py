@@ -15,6 +15,8 @@ LIMIT_INMET = 200
 # CONSTANTS
 directory_inmet = "Data/Climate-INPE/2020"
 
+OUTPUT_CSV = 'Data/proccessed.csv'
+
 #global fires
 fires = []
 
@@ -127,6 +129,21 @@ def save_fire_in_fires_list(row):
 def format_hour(hour):
     return hour[0] + hour[1] + "00" 
 
+
+def statistics():
+    print('{} - Showing one result'.format(datetime.now()))
+    hits = 0
+    valid = None
+    for index, fire in enumerate(fires):
+        if fire.inmet:
+            hits += 1
+            valid = index
+    
+    print('hits: {}/{} total'.format(hits, len(fires)))
+    print(fires[valid])
+    print(fires[valid].inmet)
+
+
 def calculate_miss():
     total = len(fires)
     found = 0
@@ -160,6 +177,7 @@ def main():
 
     print('{} - Assigning inmet to FIRES'.format(datetime.now()))
     total = len(fires)
+
     for index, fire in enumerate(fires):
         if fire.city in cities_inmet:
             assign_inmet_to(fire)
@@ -171,21 +189,47 @@ def main():
         if index % 100 == 0:
             print('{}/{}'.format(index, total))
             
+    statistics()
+    
+    fires_hitted = list(filter(lambda x: x.inmet, fires))
+    print(len(fires_hitted))
 
-    print('{} - Showing one result'.format(datetime.now()))
-    hits = 0
-    valid = None
-    for index, fire in enumerate(fires):
-        if fire.inmet:
-            hits += 1
-            valid = index
+    """
+    filename = 'Students_Data.csv'
+    with open(filename, 'w', newline="") as file:
+    csvwriter = csv.writer(file) # 2. create a csvwriter object
+    csvwriter.writerow(header) # 4. write the header
+    csvwriter.writerows(data) # 5. write the rest of the data
+    """
     
-    print('hits: {}/{} total'.format(hits, len(fires)))
-    print(fires[valid])
-    print(fires[valid].inmet)
+    fire = fires_hitted[0]
+    
+    def to_csv(obj):
+        obj = obj.__dict__
+        attr = obj.keys()
+        header = [] + list(attr)
+        body = []
+        for a in attr:
+            t = type(obj[a]).__name__
+            if t == 'str':
+                body.append(obj[a])
+            else:
+                print('inside object {}'.format(t))
+                h, b = obj[a].to_csv()
+                header += h
+                body += b
+                
+        return header, body
+    
+    print(to_csv(fire))
     
     
-
+    
+    
+    with open(OUTPUT_CSV, 'w', newline='') as f:
+        csvwriter = csv.writer(f)
+        csvwriter.writerows(fires_hitted)
+    
 
 
 if "__main__":

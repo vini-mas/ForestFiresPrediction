@@ -7,14 +7,14 @@ directory_inmet = "Data/Climate-INPE/2020"
 #global fires
 fires = []
 
-inmet = []
+one_city_inmet = []
 
 def open_and_save_inmet_file(file_inmet):
     file = open(file_inmet)
 
     type(file)
 
-    csv_reader = csv.reader(file)
+    csv_reader = csv.reader(file, delimiter=";")
 
     rows = []
     for row in csv_reader:

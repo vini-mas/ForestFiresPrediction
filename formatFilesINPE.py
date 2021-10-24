@@ -2,6 +2,7 @@ import csv
 from fire import *
 from inmet import *
 import os
+import copy
 
 directory_inmet = "Data/Climate-INPE/2020"
 
@@ -10,9 +11,7 @@ fires = []
 
 one_city_inmet_list = []
 
-city_inmet = ""
-
-def open_and_save_inmet_file(file_inmet):
+def open_and_save_inmet_file(file_inmet, city):
     file = open(file_inmet)
 
     type(file)
@@ -22,14 +21,13 @@ def open_and_save_inmet_file(file_inmet):
     rows = []
     for row in csv_reader:
         if not is_inmet_csv_header(row[0]):
-            save_inmet_in_one_city_inmet_list(row)
+            save_inmet_in_one_city_inmet_list(row, city)
 
     file.close()
 
-def save_inmet_in_one_city_inmet_list(row):
+def save_inmet_in_one_city_inmet_list(row, city):
     day = row[0]
     hour = format_hour(row[1])
-    city = city_inmet
     inmet = Inmet(day, hour, city)
     one_city_inmet_list.append(inmet)
 
@@ -71,19 +69,17 @@ def save_inmet_file_related_to(fire):
             print(fire.city)
             file_inmet = os.path.join(directory_inmet, filename)
             if os.path.isfile(file_inmet):
-                open_and_save_inmet_file(file_inmet)
+                city_inmet = fire.city
+                open_and_save_inmet_file(file_inmet, city_inmet)
                 return True
     return False
 
 def assign_inmet_to(fire):
     for inmet_entry in one_city_inmet_list:
-        print(inmet_entry.hour, fire.hour)
         if (inmet_entry.day == fire.day) and (inmet_entry.hour == fire.hour):
-            print("found")
-            #fire.inmet = copy.deepcopy(inmet_entry)
+            fire.inmet = copy.deepcopy(inmet_entry)
     
     del one_city_inmet_list [:]
-    city_inmet = ""
 
 def save_fire_in_fires_list(row):
     list_day_hour = row[0].split(" ")

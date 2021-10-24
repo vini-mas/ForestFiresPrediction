@@ -1,0 +1,26 @@
+Python2.7
+
+Task:
+    Calcular miss de cidade
+    Escrever o CSV dos dados associados.
+    Agregação e associação
+
+Futuro:
+    Como corrigir o miss.
+    Agrupar por dia dados do CLIMATE
+
+
+
+
+Campos INMET
+
+FiresOutBreak:
+    Todos os campos menos satelite e pais.
+
+Climate-INPE
+    Datahora
+    Temperatura máxima
+    Umidade Relativa do Ar, Horária
+    Vento Velocidade Horária
+
+

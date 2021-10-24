@@ -1,8 +1,11 @@
+#!/bin/python2.7
+
 import csv
 from fire import *
 from inmet import *
 import os
 import copy
+from datetime import datetime
 
 directory_inmet = "Data/Climate-INPE/2020"
 
@@ -66,7 +69,7 @@ def save_inmet_file_related_to(fire):
             pass
 
         if(fire.city == file_city):
-            print(fire.city)
+            # print(fire.city)
             file_inmet = os.path.join(directory_inmet, filename)
             if os.path.isfile(file_inmet):
                 city_inmet = fire.city
@@ -100,10 +103,59 @@ def save_fire_in_fires_list(row):
 def format_hour(hour):
     return hour[0] + hour[1] + "00" 
 
+def calculate_miss():
+    cities = {}
+    for filename in os.listdir(directory_inmet):
+        try:
+            filename_list = filename.split("_")
+            file_city = filename_list[4]
+            cities[file_city] = 0
+        except Exception as exc:
+            print(exc)
+
+    total = len(fires)
+    found = 0
+    miss = 0
+    missing_cities = {}
+    for fire in fires:
+        if fire.city in cities:
+            cities[fire.city] += 1
+            found += 1
+        else:
+            miss += 1
+            missing_cities[fire.city] = missing_cities.get(fire.city, 0) + 1
+            
+        if (found + miss) % 100 == 0:
+            print('{} - {}/{}'.format(datetime.now(), found+miss, total))
+    print('{} - {}/{}'.format(datetime.now(), found+miss, total))
+    print('{} - End: Fire Records -  Total: {}, Founded: {} / misses: {}'.format(datetime.now(), total, found, miss))
+    print('{} - Number of Cities {}'.format(datetime.now(), len(cities)))
+    print('{} - Cities Missing {}'.format(datetime.now(), len(missing_cities)))    
+
 if "__main__":
     open_file_fires()
+    #print(fires[0].city)
+    found = 0
+    miss = 0
+    cities_missing = {}
+    total = len(fires)
+    print('{} - Starting'.format(datetime.now()))
+    calculate_miss()
+
+    """
     print(fires[0].__str__())
     for fire in fires:
         if save_inmet_file_related_to(fire):
             assign_inmet_to(fire)
-            break
+            found += 1
+            # break
+        else:
+            miss += 1
+            if fire.city not in cities_missing:
+                cities_missing[fire.city] = ''
+        # print('.', end=' ')
+        if (found + miss) % 100 == 0:
+            print('{} - {}/{}'.format(datetime.now(), found+miss, total))
+    """
+    print(cities_missing)
+    print("{}/{} - from total of {}".format(found, miss, total))

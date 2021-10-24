@@ -79,9 +79,14 @@ def save_fire_in_fires_list(row):
     list_day_hour = row[0].split(" ")
     day = list_day_hour[0]
     hour = list_day_hour[1]
+    formated_hour = format_hour_to_be_the_same_as_inmet(hour)
+    print(formated_hour)
     city = row[4].upper()
-    fire = Fire(day, hour, city, None)
+    fire = Fire(day, formated_hour, city, None)
     fires.append(fire)
+
+def format_hour_to_be_the_same_as_inmet(hour):
+    return hour[0] + hour[1] + "00" 
 
 if "__main__":
     open_file_fires()

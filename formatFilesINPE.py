@@ -28,7 +28,7 @@ def open_and_save_inmet_file(file_inmet):
 
 def save_inmet_in_one_city_inmet_list(row):
     day = row[0]
-    hour = row[1]
+    hour = format_hour(row[1])
     city = city_inmet
     inmet = Inmet(day, hour, city)
     one_city_inmet_list.append(inmet)
@@ -68,31 +68,38 @@ def save_inmet_file_related_to(fire):
             pass
 
         if(fire.city == file_city):
+            print(fire.city)
             file_inmet = os.path.join(directory_inmet, filename)
             if os.path.isfile(file_inmet):
                 open_and_save_inmet_file(file_inmet)
+                return True
+    return False
 
 def assign_inmet_to(fire):
-    return
+    for inmet_entry in one_city_inmet_list:
+        print(inmet_entry.hour, fire.hour)
+        if (inmet_entry.day == fire.day) and (inmet_entry.hour == fire.hour):
+            print("found")
+            #fire.inmet = copy.deepcopy(inmet_entry)
+    
+    del one_city_inmet_list [:]
+    city_inmet = ""
 
 def save_fire_in_fires_list(row):
     list_day_hour = row[0].split(" ")
     day = list_day_hour[0]
-    hour = list_day_hour[1]
-    formated_hour = format_hour_to_be_the_same_as_inmet(hour)
-    print(formated_hour)
+    hour = format_hour(list_day_hour[1])
     city = row[4].upper()
-    fire = Fire(day, formated_hour, city, None)
+    fire = Fire(day, hour, city, None)
     fires.append(fire)
 
-def format_hour_to_be_the_same_as_inmet(hour):
+def format_hour(hour):
     return hour[0] + hour[1] + "00" 
 
 if "__main__":
     open_file_fires()
     #print(fires[0].city)
-    fires[0].city = "RIO PARDO"
-    save_inmet_file_related_to(fires[0])
-    print(one_city_inmet_list[0].day)
-    print(one_city_inmet_list[0].city)
-    assign_inmet_to(fires[0])
+    for fire in fires:
+        if save_inmet_file_related_to(fire):
+            assign_inmet_to(fire)
+            break

@@ -85,8 +85,16 @@ def save_fire_in_fires_list(row):
     list_day_hour = row[0].split(" ")
     day = list_day_hour[0]
     hour = format_hour(list_day_hour[1])
+    state = row[3].upper()
     city = row[4].upper()
-    fire = Fire(day, hour, city, None)
+    bioma = row[5].upper()
+    days_without_rain = row[6]
+    precipitation = row[7]
+    fire_risk = row[8]
+    latitude = row[9]
+    longitude = row[10]
+    frp = row[11]
+    fire = Fire(day, hour, city, bioma, days_without_rain, precipitation, fire_risk, latitude, longitude, frp, None)
     fires.append(fire)
 
 def format_hour(hour):
@@ -94,7 +102,7 @@ def format_hour(hour):
 
 if "__main__":
     open_file_fires()
-    #print(fires[0].city)
+    print(fires[0].__str__())
     for fire in fires:
         if save_inmet_file_related_to(fire):
             assign_inmet_to(fire)

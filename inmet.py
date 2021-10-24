@@ -3,4 +3,3 @@ class Inmet():
         self.day = day
         self.hour = hour
         self.city = city
-        #need to put the rest of the data

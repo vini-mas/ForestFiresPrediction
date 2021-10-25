@@ -10,7 +10,7 @@ from datetime import datetime
 # DEBUG
 PRINT_HEADER=False
 
-FORCE_LIMIT = True
+FORCE_LIMIT = False
 
 LIMIT = None
 LIMIT_INMET = None

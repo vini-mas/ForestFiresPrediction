@@ -23,10 +23,12 @@ class Inmet():
         inmet = Inmet(day, hour, city, temperatura_max, umidade_ar, vento)
         return inmet
 
+    def to_csv_header(self):
+        return ['temperatura', 'vento', 'umidade_ar']
+
     def to_csv(self):
-        h = ['temperatura', 'vento', 'umidade_ar']
-        b = [self.__dict__[x] for x in h]
-        return h, b
+        b = [self.__dict__[attr] for attr in self.to_csv_header()]
+        return b
 
     def __str__(self):
         return json.dumps(self.__dict__, indent=True)

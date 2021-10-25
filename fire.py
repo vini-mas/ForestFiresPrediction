@@ -35,6 +35,15 @@ class Fire:
         fire = Fire(day, hour, city, bioma, days_without_rain, precipitation, fire_risk, latitude, longitude, frp, None)
         return fire
 
+    def to_csv_header(self):
+        b = ['day', 'hour', 'city', 'bioma', 'days_without_rain', 'precipitation', 'fire_risk', 'latitude', 'longitude', 'frp']
+
+        return b
+    
+    def to_csv(self):
+        b = [self.__dict__[attr] for attr in self.to_csv_header()]
+        return b
+    
     def __str__(self):
         return ("Day: "+ self.day + " \nHour: " + self.hour + " \nCity: " + self.city +
                 " \nBioma: " + self.bioma + " \nDays Without Rain: " + self.days_without_rain + 

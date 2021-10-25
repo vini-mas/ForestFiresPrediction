@@ -9,8 +9,8 @@ from datetime import datetime
 
 # DEBUG
 PRINT_HEADER=False
-LIMIT = 5000 #None # the 100 first dont hit
-LIMIT_INMET = 200
+LIMIT = None #5000 # the 100 first dont hit
+LIMIT_INMET = None #20
 
 # CONSTANTS
 directory_inmet = "Data/Climate-INPE/2020"
@@ -189,46 +189,23 @@ def main():
         if index % 100 == 0:
             print('{}/{}'.format(index, total))
             
-    statistics()
-    
-    fires_hitted = list(filter(lambda x: x.inmet, fires))
-    print(len(fires_hitted))
+    # statistics()
 
-    """
-    filename = 'Students_Data.csv'
-    with open(filename, 'w', newline="") as file:
-    csvwriter = csv.writer(file) # 2. create a csvwriter object
-    csvwriter.writerow(header) # 4. write the header
-    csvwriter.writerows(data) # 5. write the rest of the data
-    """
+    fires_hitted = list(filter(lambda x: x.inmet, fires))
+    header = fires_hitted[0].to_csv_header() + fires_hitted[0].inmet.to_csv_header()
+
+    body = []
+    for fire in fires_hitted:
+        b = fire.to_csv() + fire.inmet.to_csv()
+        body.append(b)
     
-    fire = fires_hitted[0]
+    #print(json.dumps(header, indent=1))
+    #print(json.dumps(body[0], indent=1))
     
-    def to_csv(obj):
-        obj = obj.__dict__
-        attr = obj.keys()
-        header = [] + list(attr)
-        body = []
-        for a in attr:
-            t = type(obj[a]).__name__
-            if t == 'str':
-                body.append(obj[a])
-            else:
-                print('inside object {}'.format(t))
-                h, b = obj[a].to_csv()
-                header += h
-                body += b
-                
-        return header, body
-    
-    print(to_csv(fire))
-    
-    
-    
-    
-    with open(OUTPUT_CSV, 'w', newline='') as f:
+    with open(OUTPUT_CSV, 'w') as f:
         csvwriter = csv.writer(f)
-        csvwriter.writerows(fires_hitted)
+        csvwriter.writerow(header)
+        csvwriter.writerows(body)
     
 
 

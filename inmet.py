@@ -28,7 +28,7 @@ class Inmet():
 
     def to_csv(self):
         b = [self.__dict__[attr] for attr in self.to_csv_header()]
-        return b
+        return [ str(a).replace(',', '.') for a in b ]
 
     def __str__(self):
         return json.dumps(self.__dict__, indent=True)

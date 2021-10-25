@@ -187,7 +187,8 @@ def main():
             break
 
         if index % 100 == 0:
-            print('{}/{}'.format(index, total))
+            percentage = float(index)/float(total)
+            print('{:.1f}% - {}/{}'.format(percentage*100, index, total))
             
     # statistics()
 
@@ -208,6 +209,8 @@ def main():
         csvwriter.writerows(body)
     
 
+    # print(json.dumps(body, indent=True))
+    statistics()
 
 if "__main__":
     main()

@@ -9,8 +9,15 @@ from datetime import datetime
 
 # DEBUG
 PRINT_HEADER=False
-LIMIT = None #5000 # the 100 first dont hit
-LIMIT_INMET = None #20
+
+FORCE_LIMIT = True
+
+LIMIT = None
+LIMIT_INMET = None
+
+if FORCE_LIMIT:
+    LIMIT = 5000
+    LIMIT_INMET = 20
 
 # CONSTANTS
 directory_inmet = "Data/Climate-INPE/2020"
@@ -119,7 +126,7 @@ def save_inmet_file_related_to(fire):
 
 def assign_inmet_to(fire):
     for inmet_entry in cities_inmet.get(fire.city):
-        if (inmet_entry.day == fire.day) and (inmet_entry.hour == fire.hour):
+        if (inmet_entry.day == fire.day) and (inmet_entry.hour == fire.hour) and '' not in inmet_entry.to_csv():
             fire.inmet = copy.deepcopy(inmet_entry)
 
 def save_fire_in_fires_list(row):
@@ -131,7 +138,7 @@ def format_hour(hour):
 
 
 def statistics():
-    print('{} - Showing one result'.format(datetime.now()))
+    print('{} - Calculating from FIRE'.format(datetime.now()))
     hits = 0
     valid = None
     for index, fire in enumerate(fires):
@@ -140,8 +147,6 @@ def statistics():
             valid = index
     
     print('hits: {}/{} total'.format(hits, len(fires)))
-    print(fires[valid])
-    print(fires[valid].inmet)
 
 
 def calculate_miss():
@@ -160,7 +165,7 @@ def calculate_miss():
             miss += 1
             missing_cities[fire.city] = missing_cities.get(fire.city, 0) + 1
 
-    print('{} - End: Fire Records -  Total: {}, Founded: {} / misses: {}'.format(datetime.now(), total, found, miss))
+    print('{} - Fire Records\n\tTotal: {}, \n\tFounded: {} / misses: {}'.format(datetime.now(), total, found, miss))
     print('{} - Number of Cities hited {} vs cities at INMET: {}'.format(datetime.now(), len(cities), len(cities_inmet)))
     print('{} - Cities Missing {}'.format(datetime.now(), len(missing_cities)))    
 
@@ -171,9 +176,6 @@ def main():
 
     print('{} - Reading inmet files'.format(datetime.now()))
     read_inmet_files()
-
-    print('{} - Calculating misses'.format(datetime.now()))
-    calculate_miss()
 
     print('{} - Assigning inmet to FIRES'.format(datetime.now()))
     total = len(fires)
@@ -189,8 +191,6 @@ def main():
         if index % 100 == 0:
             percentage = float(index)/float(total)
             print('{:.1f}% - {}/{}'.format(percentage*100, index, total))
-            
-    # statistics()
 
     fires_hitted = list(filter(lambda x: x.inmet, fires))
     header = fires_hitted[0].to_csv_header() + fires_hitted[0].inmet.to_csv_header()
@@ -200,17 +200,18 @@ def main():
         b = fire.to_csv() + fire.inmet.to_csv()
         body.append(b)
     
-    #print(json.dumps(header, indent=1))
-    #print(json.dumps(body[0], indent=1))
-    
+
     with open(OUTPUT_CSV, 'w') as f:
         csvwriter = csv.writer(f)
         csvwriter.writerow(header)
         csvwriter.writerows(body)
-    
+
+    print('{} - Calculating misses'.format(datetime.now()))
+    calculate_miss()
+
+    statistics()
 
     # print(json.dumps(body, indent=True))
-    statistics()
 
 if "__main__":
     main()

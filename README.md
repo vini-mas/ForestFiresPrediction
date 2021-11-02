@@ -7,7 +7,7 @@ https://docs.google.com/document/d/1anPmeYa6dJVa587AyZXAsJ_aZXRHrSOzM_Yc2H8gu9M
 
 # Process of Data
 ## Creating a centralized data from INMET and INPE Fire Outbreaks
-python run.py
+python run.py  
 You can choose the years inside run.py, modifying YEARS_TO_PROCESS constant
 
 # Data

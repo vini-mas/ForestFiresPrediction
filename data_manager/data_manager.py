@@ -171,7 +171,8 @@ class DataManager:
         df = df.drop(columns=[e.name for e in dropped_columns])
 
         # Format Date to YYYY-MM-DD
-        df[column.date.name] = df[column.date.name].str.slice(0, 10).replace('/','-')
+        df[column.date.name] = df[column.date.name].str.slice(0, 10)
+        df[column.date.name] = df[column.date.name].str.replace('/','-')
 
         # Format Latitude and Longitude
         for col in [column.latitude, column.longitude]:
@@ -244,8 +245,9 @@ class DataManager:
                 str).str.replace(',', '.'), errors='coerce')
 
         # Format Date to YYYY-MM-DD
-        df[column.date.name] = df[column.date.name].str.slice(0, 10).replace('/','-')
-        
+        df[column.date.name] = df[column.date.name].str.slice(0, 10)
+        df[column.date.name] = df[column.date.name].str.replace('/','-')
+
         # GroupBy Day
         df = df.groupby([column.date.name], as_index=True, dropna=False).agg({
             column.precip.name: ['sum'],

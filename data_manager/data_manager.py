@@ -243,6 +243,9 @@ class DataManager:
             df[col.name] = pd.to_numeric(df[col.name].astype(
                 str).str.replace(',', '.'), errors='coerce')
 
+        # Format Date to YYYY-MM-DD
+        df[column.date.name] = df[column.date.name].str.slice(0, 10).replace('/','-')
+        
         # GroupBy Day
         df = df.groupby([column.date.name], as_index=True, dropna=False).agg({
             column.precip.name: ['sum'],

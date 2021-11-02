@@ -239,7 +239,7 @@ class DataManager:
         df = df.drop(columns=[e.name for e in dropped_columns])
         
         # Convert string to float values
-        for col in [column.precip, column.temp, column.max_temp, column.min_temp, column.wind]:
+        for col in [column.precip, column.temp, column.max_temp, column.min_temp, column.wind, column.max_hum, column.min_hum, column.hum]:
             df[col.name] = pd.to_numeric(df[col.name].astype(
                 str).str.replace(',', '.'), errors='coerce')
 

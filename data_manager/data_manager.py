@@ -102,7 +102,7 @@ class DataManager:
             Path(f'centralized_data/full').mkdir(parents=True, exist_ok=True)
             full_centralized_df.to_csv(f'centralized_data/full/centralized_{year}.csv', index=False)
             print('Done.')
-        else: print('({self.year_to_process}) Processed centralized resulted in empty data')
+        else: print(f'({self.year_to_process}) Processed centralized resulted in empty data')
 
 
     ## Load Fire Outbreak file

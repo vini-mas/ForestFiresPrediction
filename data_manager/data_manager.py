@@ -79,7 +79,7 @@ class DataManager:
             
             # Remove empty on temp_mean (needed to avoid saving/using files from below)
             centralized_df = centralized_df[centralized_df['temp_mean'].notnull()]
-            
+
             # Avoid saving/using files without rows from inner join of inmet and fire outbreaks data
             only_inmet_df = centralized_df[centralized_df['fire_power'].notnull()]
             if(not only_inmet_df.empty):
@@ -90,17 +90,19 @@ class DataManager:
                 centralized_df.to_csv(f'centralized_data/{year}/centralized_{state}-{city}-{biome}.csv', index=False)
 
                 # Append to full centralized DataFrame
-                if(full_centralized_df.empty):
-                    full_centralized_df = centralized_df.copy()
-                else: full_centralized_df = full_centralized_df.append(centralized_df.copy())
+                if(not full_centralized_df.empty): 
+                    full_centralized_df = full_centralized_df.append(centralized_df.copy())
+                else: full_centralized_df = centralized_df.copy()
         bar.finish()
         
-        print(f'Saving full centralized ({len(full_centralized_df.index)} rows)...')
-        # Save full centralized DataFrame
-        full_centralized_df = full_centralized_df.sort_values(by=['date'])
-        Path(f'centralized_data/full').mkdir(parents=True, exist_ok=True)
-        full_centralized_df.to_csv(f'centralized_data/full/centralized_{year}.csv', index=False)
-        print('Done.')
+        if(not full_centralized_df.empty):
+            print(f'Saving full centralized ({len(full_centralized_df.index)} rows)...')
+            # Save full centralized DataFrame
+            full_centralized_df = full_centralized_df.sort_values(by=['date'])
+            Path(f'centralized_data/full').mkdir(parents=True, exist_ok=True)
+            full_centralized_df.to_csv(f'centralized_data/full/centralized_{year}.csv', index=False)
+            print('Done.')
+        else: print('({self.year_to_process}) Processed centralized resulted in empty data')
 
 
     ## Load Fire Outbreak file

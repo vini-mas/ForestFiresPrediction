@@ -1,7 +1,7 @@
 from data_manager.data_manager import DataManager
 
-INMET_PATH = 'data/climate-inmet'
-FIRE_OUTRBREAKS_PATH = 'data/fire_outbreaks-inpe'
+INMET_PATH = 'raw_data/climate-inmet'
+FIRE_OUTRBREAKS_PATH = 'raw_data/fire_outbreaks-inpe'
 
 ## Available Years to Process:
 # '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010'

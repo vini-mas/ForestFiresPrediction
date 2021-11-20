@@ -9,12 +9,12 @@ discretize_into_gaps <- function(column, interval_gap)
 }
 
 # Read into a dataframe
-rawDf <- read.csv("centralized_data/2020/centralized_AMAZONAS-APUI-Amazonia.csv", row.names=NULL, sep =",")
+rawDf <- read.csv("centralized_data/full/centralized_2020.csv", row.names=NULL, sep =",")
 
 # Select the used rows only
-df <- rawDf[ , which(names(rawDf) %in% c('hum_median', 'temp_median', 'wind_median', 'fire_power'))]
+# df <- rawDf[ , which(names(rawDf) %in% c('hum_median', 'temp_median', 'wind_median', 'fire_power'))]
+df <- rawDf[ , which(names(rawDf) %in% c('biome', 'hum_median', 'temp_median', 'wind_median', 'fire_power'))]
 
-print(df)
 # Remove NAs
 df[is.na(df)] <- 0
 
@@ -48,10 +48,9 @@ testingPartition=df[-trainIndex, ]
 print(table(df$fire_power_category))
 print(table(trainingPartition$fire_power_category))
 print(table(testingPartition$fire_power_category))
-print(testingPartition)
 
 #Generate a classifier
-NBclassifier = naiveBayes(fire_power_category~hum_median+temp_median+wind_median, data=train)
+NBclassifier = naiveBayes(fire_power_category~biome+hum_median+temp_median+wind_median, data=trainingPartition)
 
 #Watch the classifier percentages
 print(NBclassifier)

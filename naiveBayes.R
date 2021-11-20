@@ -46,7 +46,7 @@ print(table(trainingPartition$fire_power_category))
 print(table(testingPartition$fire_power_category))
 
 #Generate a classifier
-NBclassifier = naiveBayes(fire_power_category~hum_median+precip_sum, data=train)
+NBclassifier = naiveBayes(fire_power_category~hum_median+temp_median+wind_median, data=train)
 
 #Watch the classifier percentages
 print(NBclassifier)

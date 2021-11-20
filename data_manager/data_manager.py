@@ -1,6 +1,7 @@
 from enum import Enum
 import os
 from typing import List
+import numpy as np
 import pandas as pd
 from pathlib import Path
 from pandas.core.frame import DataFrame
@@ -88,11 +89,11 @@ class DataManager:
                 (year, state, city, biome, latitude, longitude) = (fire_outbreaks_v3.year, fire_outbreaks_v3.state, fire_outbreaks_v3.city, fire_outbreaks_v3.biome, fire_outbreaks_v3.latitude, fire_outbreaks_v3.longitude)
                 
                 # Complete data from days without fire outbreaks
-                centralized_df['state'] = state
-                centralized_df['city'] = city
-                centralized_df['biome'] = biome
-                centralized_df['latitude'] = latitude
-                centralized_df['longitude'] = longitude                
+                centralized_df['state'] = centralized_df['state'].fillna(state)
+                centralized_df['city'] = centralized_df['city'].fillna(city)
+                centralized_df['biome'] = centralized_df['biome'].fillna(biome)
+                centralized_df['latitude'] = centralized_df['latitude'].fillna(latitude)
+                centralized_df['longitude'] = centralized_df['longitude'].fillna(longitude)
                 
                 Path(f'centralized_data/{year}').mkdir(parents=True, exist_ok=True)
                 centralized_df.to_csv(f'centralized_data/{year}/centralized_{state}-{city}-{biome}.csv', index=False)
@@ -258,7 +259,7 @@ class DataManager:
 
         # GroupBy Day
         df = df.groupby([column.date.name], as_index=True, dropna=False).agg({
-            column.precip.name: ['sum'],
+            column.precip.name: lambda x: x.sum(min_count=1),
             column.temp.name: ['mean', 'median'],
             column.max_temp.name: 'max',
             column.min_temp.name: 'min',
@@ -275,6 +276,7 @@ class DataManager:
             'min_temp_min': column.min_temp.name,
             'max_hum_min': column.max_hum.name,
             'min_hum_min': column.min_hum.name,
+            'precip_<lambda>': 'precip_sum',
         }, axis=1)
 
         # Count Days Without Rain
@@ -282,9 +284,9 @@ class DataManager:
         min_strong_prec = 10
 
         df['had_min_rain'] = df['precip_sum'].map(
-            lambda x: x >= min_prec)
+            lambda x: np.nan if np.isnan(x) else x >= min_prec)
         df['had_strong_rain'] = df['precip_sum'].map(
-            lambda x: x >= min_strong_prec)
+            lambda x: np.nan if np.isnan(x) else x >= min_strong_prec)
 
         df['days_wo_rain'] = ''
         df['days_wo_strong_rain'] = ''
@@ -292,20 +294,22 @@ class DataManager:
         days_without_strong_rain = 0
 
         for index, row in df.iterrows():
-            if(row['had_min_rain']):
+            if(np.isnan(row['had_min_rain']) or row['had_min_rain'] == True):
                 days_without_rain = 0
             else:
                 days_without_rain += 1
 
-            if(row['had_strong_rain']):
+            if(np.isnan(row['had_strong_rain']) or row['had_strong_rain'] == True):
                 days_without_strong_rain = 0
             else:
                 days_without_strong_rain += 1
 
-            df.at[index, 'days_wo_rain'] = days_without_rain
-            df.at[index, 'days_wo_strong_rain'] = days_without_strong_rain
+            df.at[index, 'days_wo_rain'] = np.nan if np.isnan(row['had_min_rain']) else days_without_rain
+            df.at[index, 'days_wo_strong_rain'] = np.nan if np.isnan(row['had_strong_rain']) else days_without_strong_rain
 
+        # Use mask to remove null temp_mean rows
         df = df[df['temp_mean'].notnull()]
+        
         # Read Longitude Latitude Information
         (latitude, longitude) = self.get_coord_from_inmet_file(foldername, file_name)
 

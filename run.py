@@ -11,10 +11,10 @@ def run():
     print("running")
 
     for year_to_process in YEARS_TO_PROCESS:
-        data_manager_v3 = DataManager(FIRE_OUTRBREAKS_PATH, INMET_PATH, year_to_process)  
-        data_manager_v3.process_fire_outbreaks()
-        data_manager_v3.process_inmet()
-        data_manager_v3.process_centralized_data()
+        data_manager = DataManager(FIRE_OUTRBREAKS_PATH, INMET_PATH, year_to_process)
+        data_manager.process_fire_outbreaks()
+        data_manager.process_inmet()
+        data_manager.process_centralized_data()
 
 if __name__ == '__main__':
     run()

@@ -81,10 +81,18 @@ class DataManager:
             centralized_df = centralized_df[centralized_df['temp_mean'].notnull()]
 
             # Avoid saving/using files without rows from inner join of inmet and fire outbreaks data
-            only_inmet_df = centralized_df[centralized_df['state'].notnull()]
+            only_inmet_df = centralized_df[centralized_df['state'].notnull()]            
+            
             if(not only_inmet_df.empty):
                 # Save Centralized DataFrame
-                (year, state, city, biome) = (fire_outbreaks_v3.year, fire_outbreaks_v3.state, fire_outbreaks_v3.city, fire_outbreaks_v3.biome)
+                (year, state, city, biome, latitude, longitude) = (fire_outbreaks_v3.year, fire_outbreaks_v3.state, fire_outbreaks_v3.city, fire_outbreaks_v3.biome, fire_outbreaks_v3.latitude, fire_outbreaks_v3.longitude)
+                
+                # Complete data from days without fire outbreaks
+                centralized_df['state'] = state
+                centralized_df['city'] = city
+                centralized_df['biome'] = biome
+                centralized_df['latitude'] = latitude
+                centralized_df['longitude'] = longitude                
                 
                 Path(f'centralized_data/{year}').mkdir(parents=True, exist_ok=True)
                 centralized_df.to_csv(f'centralized_data/{year}/centralized_{state}-{city}-{biome}.csv', index=False)

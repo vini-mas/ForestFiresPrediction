@@ -81,7 +81,7 @@ class DataManager:
             centralized_df = centralized_df[centralized_df['temp_mean'].notnull()]
 
             # Avoid saving/using files without rows from inner join of inmet and fire outbreaks data
-            only_inmet_df = centralized_df[centralized_df['fire_power'].notnull()]
+            only_inmet_df = centralized_df[centralized_df['state'].notnull()]
             if(not only_inmet_df.empty):
                 # Save Centralized DataFrame
                 (year, state, city, biome) = (fire_outbreaks_v3.year, fire_outbreaks_v3.state, fire_outbreaks_v3.city, fire_outbreaks_v3.biome)

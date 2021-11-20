@@ -9,8 +9,12 @@ discretize_into_gaps <- function(column, interval_gap)
 }
 
 # Read into a dataframe
-df <- read.csv("centralized_data/2020/centralized_AMAZONAS-APUI-Amazonia.csv", row.names=NULL, sep =",")
+rawDf <- read.csv("centralized_data/2020/centralized_AMAZONAS-APUI-Amazonia.csv", row.names=NULL, sep =",")
 
+# Select the used rows only
+df <- rawDf[ , which(names(rawDf) %in% c('hum_median', 'temp_median', 'wind_median', 'fire_power'))]
+
+print(df)
 # Remove NAs
 df[is.na(df)] <- 0
 
@@ -34,8 +38,8 @@ plot(df$temp_median,
 #Set a random seed for partitioning
 set.seed(Sys.time())
 
-#Create 2 partitions, 70% being the training, 30% being the testing
-trainingPercentage = 0.7
+#Create 2 partitions, 80% being the training, 30% being the testing
+trainingPercentage = 0.8
 trainIndex=createDataPartition(df$fire_power_category, p=trainingPercentage)$Resample1
 trainingPartition=df[trainIndex, ]
 testingPartition=df[-trainIndex, ]
@@ -44,6 +48,7 @@ testingPartition=df[-trainIndex, ]
 print(table(df$fire_power_category))
 print(table(trainingPartition$fire_power_category))
 print(table(testingPartition$fire_power_category))
+print(testingPartition)
 
 #Generate a classifier
 NBclassifier = naiveBayes(fire_power_category~hum_median+temp_median+wind_median, data=train)
@@ -71,4 +76,18 @@ print(testTable)
 
 message("Accuracy")
 print(round(cbind(trainAccuracy=trainAcc, testAccuracy=testAcc),3))
+
+# Below we added a way of testing the prediction of a single value
+# Just add the desired values in the list(value1, value2, valueN...)
+# Create a single testing data
+# 'hum_median', 'temp_median', 'wind_median', 'fire_power'
+singlePartition <- df[1,]
+print(singlePartition)
+singlePartition[1,] <- list(99999, 27, 80, 1.38, singlePartition[,5])
+print(singlePartition)
+
+# Predict with the training partition
+singlePred=predict(NBclassifier, newdata=singlePartition, type = "class")
+print('Fire predicted:')
+print(singlePred)
 

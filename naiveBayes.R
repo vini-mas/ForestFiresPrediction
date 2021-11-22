@@ -9,33 +9,37 @@ discretize_into_gaps <- function(column, interval_gap)
 }
 
 # Read into a dataframe
-df <- read.csv("centralized_data/2020/centralized_AMAZONAS-APUI-Amazonia.csv", row.names=NULL, sep =",")
+rawDf <- read.csv("merged_centralized.csv", row.names=NULL, sep =",")
+
+# Select the used rows only
+# df <- rawDf[ , which(names(rawDf) %in% c('hum_median', 'temp_median', 'wind_median', 'fire_power'))]
+#df <- rawDf[ , which(names(rawDf) %in% c('biome', 'hum_median', 'temp_median', 'wind_median', 'fire_power'))]
 
 # Remove NAs
 df[is.na(df)] <- 0
 
 # Create firepower categories
-df$fire_power_category <- discretize_into_gaps(df$fire_power, 30)
-
-# Visualizando a distribuicao dos fogos por dia
-barplot(df$fire_power,
-        names.arg=df$date,
-        main="Histograma - Distribuicao dos fogos por dia", 
-        xlab="Dia", 
-        ylab="Poder de Fogo")
-
-# Visualizando a humidade por dia
-plot(df$temp_median, 
-     main="Histograma - Distribuicao de humidade por dia", 
-     xlab="Dia", 
-     ylab="Poder de Fogo",
-)
+df$fire_power_category <- discretize_into_gaps(df$had_fire_outbreak, 50)
+# 
+# # Visualizando a distribuicao dos fogos por dia
+# barplot(df$fire_power,
+#         names.arg=df$date,
+#         main="Histograma - Distribuicao dos fogos por dia", 
+#         xlab="Dia", 
+#         ylab="Poder de Fogo")
+# 
+# # Visualizando a humidade por dia
+# plot(df$temp_median, 
+#      main="Histograma - Distribuicao de humidade por dia", 
+#      xlab="Dia", 
+#      ylab="Poder de Fogo",
+# )
 
 #Set a random seed for partitioning
 set.seed(Sys.time())
 
-#Create 2 partitions, 70% being the training, 30% being the testing
-trainingPercentage = 0.7
+#Create 2 partitions, 80% being the training, 30% being the testing
+trainingPercentage = 0.8
 trainIndex=createDataPartition(df$fire_power_category, p=trainingPercentage)$Resample1
 trainingPartition=df[trainIndex, ]
 testingPartition=df[-trainIndex, ]
@@ -46,7 +50,7 @@ print(table(trainingPartition$fire_power_category))
 print(table(testingPartition$fire_power_category))
 
 #Generate a classifier
-NBclassifier = naiveBayes(fire_power_category~hum_median+temp_median+wind_median, data=train)
+NBclassifier = naiveBayes(fire_power_category~hum_mean+temp_mean+precip_sum, data=trainingPartition)
 
 #Watch the classifier percentages
 print(NBclassifier)
@@ -71,4 +75,18 @@ print(testTable)
 
 message("Accuracy")
 print(round(cbind(trainAccuracy=trainAcc, testAccuracy=testAcc),3))
+
+# Below we added a way of testing the prediction of a single value
+# Just add the desired values in the list(value1, value2, valueN...)
+# Create a single testing data
+# 'hum_median', 'temp_median', 'wind_median', 'fire_power'
+singlePartition <- df[1,]
+print(singlePartition)
+singlePartition[1,] <- list(99999, 27, 80, 1.38, singlePartition[,5])
+print(singlePartition)
+
+# Predict with the training partition
+singlePred=predict(NBclassifier, newdata=singlePartition, type = "class")
+print('Fire predicted:')
+print(singlePred)
 
